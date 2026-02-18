@@ -470,11 +470,13 @@ def chart_timeline(df):
         customdata=df['Prediction'],
     ))
     fig.update_layout(
-        **PLOT_THEME,
+        paper_bgcolor='rgba(26,32,53,1)',
+        plot_bgcolor='rgba(26,32,53,1)',
+        font=dict(family='Space Mono, monospace', color='#8892b0', size=11),
         title=dict(text='Per-Window Prediction Timeline', font=dict(size=13, color='#e8eaf6')),
-        xaxis_title='Window Number',
-        yaxis_title='Confidence (%)',
-        yaxis=dict(range=[0, 105], gridcolor='#2d3561', linecolor='#2d3561'),
+        xaxis=dict(title='Window Number', gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        yaxis=dict(title='Confidence (%)', range=[0, 105], gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
         showlegend=False,
         height=300,
     )
@@ -497,11 +499,13 @@ def chart_probability_line(df):
     ))
     fig.add_hline(y=50, line_dash='dot', line_color='#8892b0', line_width=1)
     fig.update_layout(
-        **PLOT_THEME,
+        paper_bgcolor='rgba(26,32,53,1)',
+        plot_bgcolor='rgba(26,32,53,1)',
+        font=dict(family='Space Mono, monospace', color='#8892b0', size=11),
         title=dict(text='Probability Over Time', font=dict(size=13, color='#e8eaf6')),
-        xaxis_title='Window Number',
-        yaxis_title='Probability (%)',
-        yaxis=dict(range=[0, 105], gridcolor='#2d3561', linecolor='#2d3561'),
+        xaxis=dict(title='Window Number', gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        yaxis=dict(title='Probability (%)', range=[0, 105], gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
         legend=dict(
             bgcolor='rgba(0,0,0,0)', bordercolor='#2d3561',
             font=dict(color='#8892b0', size=10),
@@ -526,8 +530,11 @@ def chart_donut(fokus_pct, tidak_fokus_pct):
     max_pct = max(fokus_pct, tidak_fokus_pct)
     
     fig.update_layout(
-        **PLOT_THEME,
+        paper_bgcolor='rgba(26,32,53,1)',
+        plot_bgcolor='rgba(26,32,53,1)',
+        font=dict(family='Space Mono, monospace', color='#8892b0', size=11),
         title=dict(text='Distribution', font=dict(size=13, color='#e8eaf6')),
+        margin=dict(l=40, r=20, t=40, b=40),
         showlegend=True,
         legend=dict(
             bgcolor='rgba(0,0,0,0)', 
@@ -568,10 +575,13 @@ def chart_confidence_hist(df):
             nbinsx=20, hovertemplate='Confidence: %{x:.0f}%<br>Count: %{y}<extra></extra>'
         ))
     fig.update_layout(
-        **PLOT_THEME,
+        paper_bgcolor='rgba(26,32,53,1)',
+        plot_bgcolor='rgba(26,32,53,1)',
+        font=dict(family='Space Mono, monospace', color='#8892b0', size=11),
         title=dict(text='Confidence Distribution', font=dict(size=13, color='#e8eaf6')),
-        xaxis_title='Confidence (%)',
-        yaxis_title='Count',
+        xaxis=dict(title='Confidence (%)', gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        yaxis=dict(title='Count', gridcolor='#2d3561', linecolor='#2d3561', tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
         barmode='overlay',
         legend=dict(
             bgcolor='rgba(0,0,0,0)', font=dict(color='#8892b0', size=10),
@@ -658,7 +668,7 @@ with st.sidebar:
 # Header
 st.markdown("""
 <div class="main-header">
-    <p class="header-title">🧠 Focus Detection System</p>
+    <p class="header-title">🧠 IDENTIFIKASI POLA GELOMBANG OTAK DAN AKTIVITAS JANTUNG SEBAGAI INDIKATOR FOKUS BELAJAR MAHASISWA BERBASIS DEEP LEARNING</p>
     <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning · Real-time Classification</p>
     <span class="header-badge">LSTM · TESIS · v1.0</span>
 </div>
