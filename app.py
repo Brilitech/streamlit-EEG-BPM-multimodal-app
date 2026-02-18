@@ -668,9 +668,10 @@ with st.sidebar:
 # Header
 st.markdown("""
 <div class="main-header">
-    <p class="header-title">🧠 Focus Detection System</p>
-    <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning · Real-time Classification</p>
-    <span class="header-badge">LSTM · TESIS · v1.0</span>
+    <p class="header-title">🧠 IDENTIFIKASI POLA GELOMBANG OTAK DAN AKTIVITAS JANTUNG SEBAGAI INDIKATOR FOKUS BELAJAR MAHASISWA BERBASIS DEEP LEARNING</p>
+    <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning</p>
+    <p class="header-subtitle">Muhammad Azril Haidar Al Matiin - 23051640011</p>
+    <span class="header-badge">LSTM · TESIS · Multimodal · v1.3</span>
 </div>
 """, unsafe_allow_html=True)
 
