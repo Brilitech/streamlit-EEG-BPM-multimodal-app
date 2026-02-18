@@ -522,21 +522,31 @@ def chart_donut(fokus_pct, tidak_fokus_pct):
         textfont=dict(family='Space Mono', size=12, color='white'),
         hovertemplate='%{label}: %{value:.1f}%<extra></extra>'
     ))
+    
+    max_pct = max(fokus_pct, tidak_fokus_pct)
+    
     fig.update_layout(
         **PLOT_THEME,
         title=dict(text='Distribution', font=dict(size=13, color='#e8eaf6')),
         showlegend=True,
         legend=dict(
-            bgcolor='rgba(0,0,0,0)', font=dict(color='#8892b0', size=10),
-            orientation='h', yanchor='bottom', y=-0.15, xanchor='center', x=0.5
+            bgcolor='rgba(0,0,0,0)', 
+            font=dict(color='#8892b0', size=10),
+            orientation='h', 
+            yanchor='bottom', 
+            y=-0.15, 
+            xanchor='center', 
+            x=0.5
         ),
         height=300,
         annotations=[dict(
-            text=f"<b>{max(fokus_pct, tidak_fokus_pct):.0f}%</b>",
-            x=0.5, y=0.5, showarrow=False,
+            text=f"<b>{max_pct:.0f}%</b>",
+            x=0.5, 
+            y=0.5, 
+            showarrow=False,
             font=dict(family='Space Mono', size=22, color='#e8eaf6')
         )]
-    ))
+    )
     return fig
 
 def chart_confidence_hist(df):
@@ -886,3 +896,4 @@ with tab2:
         file_name=f"focus_prediction_results.csv",
         mime="text/csv"
     )
+
