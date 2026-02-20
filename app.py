@@ -14,7 +14,7 @@ from plotly.subplots import make_subplots
 # ============================================================================
 
 st.set_page_config(
-    page_title="IDENTIFIKASI POLA GELOMBANG OTAK DAN AKTIVITAS JANTUNG SEBAGAI INDIKATOR FOKUS BELAJAR MAHASISWA BERBASIS DEEP LEARNING",
+    page_title="Focus Detection System",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -668,10 +668,10 @@ with st.sidebar:
 # Header
 st.markdown("""
 <div class="main-header">
-    <p class="header-title">🧠 IDENTIFIKASI POLA GELOMBANG OTAK DAN AKTIVITAS JANTUNG SEBAGAI INDIKATOR FOKUS BELAJAR MAHASISWA BERBASIS DEEP LEARNING</p>
+    <p class="header-title">🧠 System Identifikasi Tingkat Fokus</p>
     <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning</p>
     <p class="header-subtitle">Muhammad Azril Haidar Al Matiin - 23051640011</p>
-    <span class="header-badge">LSTM · TESIS · Multimodal · v1.3</span>
+    <span class="header-badge">Multimodal · TESIS · v1.4</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -869,7 +869,8 @@ with tab1:
         else:
             return 'color: #ff4757; font-weight: bold'
     
-    styled_df = results_df.style.applymap(
+    # FIX: Use .map() instead of deprecated .applymap() for Pandas 2.x
+    styled_df = results_df.style.map(
         color_prediction, subset=['Prediction']
     ).format({
         'Confidence (%)': '{:.2f}',
@@ -901,4 +902,3 @@ with tab2:
         file_name=f"focus_prediction_results.csv",
         mime="text/csv"
     )
-
