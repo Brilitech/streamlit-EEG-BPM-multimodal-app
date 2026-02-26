@@ -668,7 +668,7 @@ with st.sidebar:
 # Header
 st.markdown("""
 <div class="main-header">
-    <p class="header-title">🧠 System Identifikasi Tingkat Fokus</p>
+    <p class="header-title">🧠 Identidikasi Tingkat Fokus berbasis Multimodal</p>
     <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning</p>
     <p class="header-subtitle">Muhammad Azril Haidar Al Matiin - 23051640011</p>
     <span class="header-badge">Multimodal · TESIS · v1.4</span>
