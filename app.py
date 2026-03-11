@@ -127,7 +127,7 @@ def get_css(t):
         overflow: hidden;
     }}
     .main-header::after {{
-        content: 'EEG·BPM·LSTM';
+        content: '';
         position: absolute;
         right: 40px;
         top: 50%;
@@ -772,12 +772,12 @@ with st.sidebar:
 st.markdown("""
 <div class="main-header">
     <div class="header-eyebrow">Focus Detection System</div>
-    <h1 class="header-title">Identifikasi Tingkat Fokus berbasis Multimodal</h1>
+    <h1 class="header-title">🧠 Identifikasi Tingkat Fokus berbasis Multimodal</h1>
     <p class="header-sub">EEG + BPM Multimodal Analysis &nbsp;·&nbsp; LSTM Deep Learning &nbsp;·&nbsp; Muhammad Azril Haidar Al Matiin — 23051640011</p>
     <div class="header-badges">
         <span class="badge badge-green">● Multimodal</span>
         <span class="badge badge-green">● TESIS</span>
-        <span class="badge badge-blue">▲ v1.5</span>
+        <span class="badge badge-blue">▲ v2.1</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
