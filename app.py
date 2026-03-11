@@ -642,34 +642,31 @@ def chart_probability_line(df, t):
     )
     return fig
 
-def chart_probability_line(df, t):
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df['Window'], y=df['Fokus Prob (%)'],
-        name='Fokus', line=dict(color=t['accent-green'], width=2),
-        fill='tozeroy', 
-        fillcolor=f"rgba({t['rgb-green']}, 0.15)", # <-- UBAH BAGIAN INI
-        hovertemplate='Window %{x}<br>Fokus: %{y:.1f}%<extra></extra>'
+def chart_donut(fokus_pct, tidak_pct, t):
+    max_pct = max(fokus_pct, tidak_pct)
+    fig = go.Figure(go.Pie(
+        labels=['Fokus', 'Tidak Fokus'],
+        values=[fokus_pct, tidak_pct],
+        hole=0.68,
+        marker=dict(colors=[t['accent-green'], t['accent-red']], line=dict(width=0)),
+        textinfo='percent',
+        textfont=dict(family='IBM Plex Mono', size=11, color=t['text-primary']),
+        hovertemplate='%{label}: %{value:.1f}%<extra></extra>'
     ))
-    fig.add_trace(go.Scatter(
-        x=df['Window'], y=df['Tidak Fokus Prob (%)'],
-        name='Tidak Fokus', line=dict(color=t['accent-red'], width=2),
-        fill='tozeroy', 
-        fillcolor=f"rgba({t['rgb-red']}, 0.15)",   # <-- UBAH BAGIAN INI
-        hovertemplate='Window %{x}<br>Tidak Fokus: %{y:.1f}%<extra></extra>'
-    ))
-    fig.add_hline(y=50, line_dash='dot', line_color=t['text-secondary'], line_width=1)
     fig.update_layout(
         paper_bgcolor=t['bg-chart'], plot_bgcolor=t['plot-chart'],
         font=dict(family='IBM Plex Mono, monospace', color=t['text-secondary'], size=11),
-        title=dict(text='Probability Over Time', font=dict(size=12, color=t['text-primary'])),
-        xaxis=dict(title='Window', gridcolor=t['grid-color'], linecolor=t['border'], tickfont=dict(size=10)),
-        yaxis=dict(title='Probability (%)', range=[0, 108], gridcolor=t['grid-color'], linecolor=t['border'], tickfont=dict(size=10)),
-        margin=dict(l=40, r=20, t=44, b=40),
-        legend=dict(bgcolor='rgba(0,0,0,0)', bordercolor=t['border'],
-                    font=dict(color=t['text-secondary'], size=10),
-                    orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        title=dict(text='Distribution', font=dict(size=12, color=t['text-primary'])),
+        margin=dict(l=30, r=30, t=44, b=30),
+        showlegend=True,
+        legend=dict(bgcolor='rgba(0,0,0,0)', font=dict(color=t['text-secondary'], size=10),
+                    orientation='h', yanchor='bottom', y=-0.15, xanchor='center', x=0.5),
         height=300,
+        annotations=[dict(
+            text=f"<b>{max_pct:.0f}%</b>",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(family='IBM Plex Mono', size=20, color=t['text-primary'])
+        )]
     )
     return fig
 
