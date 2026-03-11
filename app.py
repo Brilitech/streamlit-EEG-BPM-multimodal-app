@@ -677,13 +677,13 @@ def chart_confidence_hist(df, t):
     if len(fokus_conf):
         fig.add_trace(go.Histogram(
             x=fokus_conf, name='Fokus',
-            marker_color=f"{t['accent-green']}b3",
+            marker_color=f"rgba({t['rgb-green']},0.7)",
             nbinsx=20, hovertemplate='Confidence: %{x:.0f}%<br>Count: %{y}<extra></extra>'
         ))
     if len(tidak_conf):
         fig.add_trace(go.Histogram(
             x=tidak_conf, name='Tidak Fokus',
-            marker_color=f"{t['accent-red']}b3",
+            marker_color=f"rgba({t['rgb-red']},0.7)",
             nbinsx=20, hovertemplate='Confidence: %{x:.0f}%<br>Count: %{y}<extra></extra>'
         ))
     fig.update_layout(
