@@ -618,13 +618,13 @@ def chart_probability_line(df, t):
     fig.add_trace(go.Scatter(
         x=df['Window'], y=df['Fokus Prob (%)'],
         name='Fokus', line=dict(color=t['accent-green'], width=2),
-        fill='tozeroy', fillcolor=f"{t['accent-green']}18",
+        fill='tozeroy', fillcolor=f"rgba({t['rgb-green']},0.09)",
         hovertemplate='Window %{x}<br>Fokus: %{y:.1f}%<extra></extra>'
     ))
     fig.add_trace(go.Scatter(
         x=df['Window'], y=df['Tidak Fokus Prob (%)'],
         name='Tidak Fokus', line=dict(color=t['accent-red'], width=2),
-        fill='tozeroy', fillcolor=f"{t['accent-red']}18",
+        fill='tozeroy', fillcolor=f"rgba({t['rgb-red']},0.09)",
         hovertemplate='Window %{x}<br>Tidak Fokus: %{y:.1f}%<extra></extra>'
     ))
     fig.add_hline(y=50, line_dash='dot', line_color=t['text-secondary'], line_width=1)
