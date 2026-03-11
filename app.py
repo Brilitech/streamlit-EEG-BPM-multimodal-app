@@ -21,75 +21,72 @@ st.set_page_config(
 )
 
 # ============================================================================
-# THEME SYSTEM - Initialize Session State
+# SESSION STATE - THEME
 # ============================================================================
 
-# Initialize theme in session state if not exists
-if 'theme' not in st.session_state:
-    st.session_state.theme = 'dark'  # Default theme
+if 'theme_mode' not in st.session_state:
+    st.session_state.theme_mode = 'dark'  # Default: dark
 
 # ============================================================================
-# THEME DEFINITIONS
+# THEME CONFIGURATION
 # ============================================================================
 
 THEMES = {
     'dark': {
-        'bg_primary': '#0a0e1a',
-        'bg_secondary': '#111827',
-        'bg_card': '#1a2035',
-        'accent_green': '#00ff88',
-        'accent_red': '#ff4757',
-        'accent_blue': '#4facfe',
-        'accent_yellow': '#ffd32a',
-        'text_primary': '#e8eaf6',
-        'text_secondary': '#8892b0',
+        'bg-primary': '#0a0e1a',
+        'bg-secondary': '#111827',
+        'bg-card': '#1a2035',
+        'accent-green': '#00ff88',
+        'accent-red': '#ff4757',
+        'accent-blue': '#4facfe',
+        'accent-yellow': '#ffd32a',
+        'text-primary': '#e8eaf6',
+        'text-secondary': '#8892b0',
         'border': '#2d3561',
-        'shadow': 'rgba(0,0,0,0.3)',
-        'gradient_start': '#0a0e1a',
-        'gradient_mid': '#1a2035',
-        'gradient_end': '#0d1b2a',
+        'bg-chart': 'rgba(26,32,53,1)',
+        'plot-chart': 'rgba(26,32,53,1)',
+        'grid-color': '#2d3561',
     },
     'light': {
-        'bg_primary': '#f8f9fa',
-        'bg_secondary': '#ffffff',
-        'bg_card': '#ffffff',
-        'accent_green': '#00c853',
-        'accent_red': '#d32f2f',
-        'accent_blue': '#1976d2',
-        'accent_yellow': '#ffa000',
-        'text_primary': '#212121',
-        'text_secondary': '#616161',
+        'bg-primary': '#f8f9fa',
+        'bg-secondary': '#ffffff',
+        'bg-card': '#ffffff',
+        'accent-green': '#00a85c',
+        'accent-red': '#d63447',
+        'accent-blue': '#0066cc',
+        'accent-yellow': '#ff9500',
+        'text-primary': '#1a1a1a',
+        'text-secondary': '#666666',
         'border': '#e0e0e0',
-        'shadow': 'rgba(0,0,0,0.1)',
-        'gradient_start': '#f5f5f5',
-        'gradient_mid': '#ffffff',
-        'gradient_end': '#fafafa',
+        'bg-chart': 'rgba(255,255,255,1)',
+        'plot-chart': 'rgba(255,255,255,1)',
+        'grid-color': '#e8e8e8',
     }
 }
 
-# Get current theme
-theme = THEMES[st.session_state.theme]
+current_theme = THEMES[st.session_state.theme_mode]
 
 # ============================================================================
-# DYNAMIC CSS BASED ON THEME
+# CUSTOM CSS - Dynamic Theme
 # ============================================================================
 
-st.markdown(f"""
+def get_css(theme, is_dark):
+    """Generate CSS based on current theme"""
+    return f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
     
     :root {{
-        --bg-primary: {theme['bg_primary']};
-        --bg-secondary: {theme['bg_secondary']};
-        --bg-card: {theme['bg_card']};
-        --accent-green: {theme['accent_green']};
-        --accent-red: {theme['accent_red']};
-        --accent-blue: {theme['accent_blue']};
-        --accent-yellow: {theme['accent_yellow']};
-        --text-primary: {theme['text_primary']};
-        --text-secondary: {theme['text_secondary']};
+        --bg-primary: {theme['bg-primary']};
+        --bg-secondary: {theme['bg-secondary']};
+        --bg-card: {theme['bg-card']};
+        --accent-green: {theme['accent-green']};
+        --accent-red: {theme['accent-red']};
+        --accent-blue: {theme['accent-blue']};
+        --accent-yellow: {theme['accent-yellow']};
+        --text-primary: {theme['text-primary']};
+        --text-secondary: {theme['text-secondary']};
         --border: {theme['border']};
-        --shadow: {theme['shadow']};
     }}
     
     /* Main background */
@@ -97,6 +94,7 @@ st.markdown(f"""
         background: var(--bg-primary);
         font-family: 'DM Sans', sans-serif;
         color: var(--text-primary);
+        transition: background 0.3s ease, color 0.3s ease;
     }}
     
     /* Hide default streamlit elements */
@@ -108,47 +106,19 @@ st.markdown(f"""
     [data-testid="stSidebar"] {{
         background: var(--bg-secondary) !important;
         border-right: 1px solid var(--border);
-    }}
-    
-    [data-testid="stSidebar"] * {{
-        color: var(--text-primary) !important;
-    }}
-    
-    /* Theme Toggle Button */
-    .theme-toggle {{
-        position: fixed;
-        top: 16px;
-        right: 16px;
-        z-index: 999999;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 8px 16px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px var(--shadow);
-        transition: all 0.3s ease;
-    }}
-    
-    .theme-toggle:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px var(--shadow);
-    }}
-    
-    .theme-toggle-icon {{
-        font-size: 20px;
-        margin-right: 8px;
+        transition: background 0.3s ease, border-color 0.3s ease;
     }}
     
     /* Header */
     .main-header {{
-        background: linear-gradient(135deg, {theme['gradient_start']} 0%, {theme['gradient_mid']} 50%, {theme['gradient_end']} 100%);
+        background: linear-gradient(135deg, {theme['bg-primary']} 0%, {theme['bg-card']} 50%, {theme['bg-secondary']} 100%);
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 32px 40px;
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px var(--shadow);
+        transition: background 0.3s ease, border-color 0.3s ease;
     }}
     
     .main-header::before {{
@@ -158,7 +128,7 @@ st.markdown(f"""
         right: -10%;
         width: 400px;
         height: 400px;
-        background: radial-gradient(circle, {'rgba(0,255,136,0.06)' if st.session_state.theme == 'dark' else 'rgba(25,118,210,0.08)'} 0%, transparent 70%);
+        background: radial-gradient(circle, rgba({'0,255,136' if is_dark else '0,168,92'}},0.06) 0%, transparent 70%);
         border-radius: 50%;
     }}
     
@@ -169,7 +139,7 @@ st.markdown(f"""
         left: -10%;
         width: 300px;
         height: 300px;
-        background: radial-gradient(circle, {'rgba(79,172,254,0.06)' if st.session_state.theme == 'dark' else 'rgba(0,200,83,0.08)'} 0%, transparent 70%);
+        background: radial-gradient(circle, rgba({'79,172,254' if is_dark else '0,102,204'}},0.06) 0%, transparent 70%);
         border-radius: 50%;
     }}
     
@@ -177,216 +147,260 @@ st.markdown(f"""
         font-family: 'Space Mono', monospace;
         font-size: 2.2rem;
         font-weight: 700;
-        background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+        background: linear-gradient(90deg, {theme['accent-green']}, {theme['accent-blue']});
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 1;
+        margin: 0;
+        letter-spacing: -1px;
     }}
     
     .header-subtitle {{
         color: var(--text-secondary);
-        font-size: 1rem;
-        position: relative;
-        z-index: 1;
+        font-size: 0.95rem;
+        margin-top: 6px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
     }}
     
-    /* File Upload Section */
-    .upload-section {{
-        background: var(--bg-card);
-        border: 1px dashed var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        transition: all 0.3s ease;
+    .header-badge {{
+        display: inline-block;
+        background: rgba({'0,255,136' if is_dark else '0,168,92'},0.1);
+        border: 1px solid rgba({'0,255,136' if is_dark else '0,168,92'},0.3);
+        color: {theme['accent-green']};
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-family: 'Space Mono', monospace;
+        margin-top: 12px;
+        letter-spacing: 1px;
+        transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }}
     
-    .upload-section:hover {{
-        border-color: var(--accent-blue);
-        background: {'#1e2744' if st.session_state.theme == 'dark' else '#f5f5f5'};
-    }}
-    
-    /* Verdict Banner */
-    .verdict-banner {{
-        border-radius: 16px;
-        padding: 24px 32px;
-        margin: 24px 0;
-        font-size: 1.8rem;
-        font-weight: 700;
-        text-align: center;
-        box-shadow: 0 8px 24px var(--shadow);
-        animation: slideIn 0.5s ease-out;
-    }}
-    
-    @keyframes slideIn {{
-        from {{
-            opacity: 0;
-            transform: translateY(-20px);
-        }}
-        to {{
-            opacity: 1;
-            transform: translateY(0);
-        }}
-    }}
-    
-    .verdict-fokus {{
-        background: linear-gradient(135deg, {'#00ff8840' if st.session_state.theme == 'dark' else '#e8f5e9'} 0%, {'#00ff8820' if st.session_state.theme == 'dark' else '#c8e6c9'} 100%);
-        border: 2px solid var(--accent-green);
-        color: var(--accent-green);
-    }}
-    
-    .verdict-tidak-fokus {{
-        background: linear-gradient(135deg, {'#ff475740' if st.session_state.theme == 'dark' else '#ffebee'} 0%, {'#ff475720' if st.session_state.theme == 'dark' else '#ffcdd2'} 100%);
-        border: 2px solid var(--accent-red);
-        color: var(--accent-red);
-    }}
-    
-    /* Metric Cards */
+    /* Metric cards */
     .metric-card {{
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 8px var(--shadow);
-        transition: all 0.3s ease;
+        padding: 20px 24px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: {'0 2px 4px rgba(0,0,0,0.1)' if not is_dark else '0 2px 8px rgba(0,0,0,0.2)'};
     }}
     
     .metric-card:hover {{
-        transform: translateY(-4px);
-        box-shadow: 0 8px 16px var(--shadow);
-        border-color: var(--accent-blue);
+        border-color: rgba({'0,255,136' if is_dark else '0,168,92'},0.3);
     }}
     
     .metric-label {{
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         color: var(--text-secondary);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.5px;
+        font-family: 'Space Mono', monospace;
         margin-bottom: 8px;
+        transition: color 0.3s ease;
     }}
     
     .metric-value {{
+        font-family: 'Space Mono', monospace;
         font-size: 2rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin-bottom: 4px;
+        line-height: 1;
+        transition: color 0.3s ease;
     }}
     
-    .metric-unit {{
-        font-size: 0.9rem;
+    .metric-sub {{
+        font-size: 0.8rem;
         color: var(--text-secondary);
+        margin-top: 6px;
+        transition: color 0.3s ease;
     }}
     
-    /* Charts */
-    .chart-container {{
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 8px var(--shadow);
+    .metric-accent-green {{ border-left: 3px solid {theme['accent-green']}; }}
+    .metric-accent-blue  {{ border-left: 3px solid {theme['accent-blue']}; }}
+    .metric-accent-red   {{ border-left: 3px solid {theme['accent-red']}; }}
+    .metric-accent-yellow{{ border-left: 3px solid {theme['accent-yellow']}; }}
+    
+    /* Verdict card */
+    .verdict-fokus {{
+        background: linear-gradient(135deg, rgba({'0,255,136' if is_dark else '0,168,92'},0.1) 0%, rgba({'0,255,136' if is_dark else '0,168,92'},0.05) 100%);
+        border: 2px solid rgba({'0,255,136' if is_dark else '0,168,92'},0.4);
+        border-radius: 16px;
+        padding: 28px 32px;
+        text-align: center;
+        transition: background 0.3s ease, border-color 0.3s ease;
     }}
     
-    /* Buttons */
-    .stButton > button {{
-        background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 32px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px var(--shadow);
+    .verdict-tidak-fokus {{
+        background: linear-gradient(135deg, rgba({'255,71,87' if is_dark else '214,52,71'},0.1) 0%, rgba({'255,71,87' if is_dark else '214,52,71'},0.05) 100%);
+        border: 2px solid rgba({'255,71,87' if is_dark else '214,52,71'},0.4);
+        border-radius: 16px;
+        padding: 28px 32px;
+        text-align: center;
+        transition: background 0.3s ease, border-color 0.3s ease;
     }}
     
-    .stButton > button:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px var(--shadow);
+    .verdict-label {{
+        font-family: 'Space Mono', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        transition: color 0.3s ease;
     }}
     
-    /* Data Table */
-    .dataframe {{
-        background: var(--bg-card) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
+    .verdict-text-fokus {{
+        font-family: 'Space Mono', monospace;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: {theme['accent-green']};
+        transition: color 0.3s ease;
     }}
     
-    .dataframe th {{
-        background: var(--bg-secondary) !important;
-        color: var(--text-primary) !important;
-        border-bottom: 2px solid var(--border) !important;
+    .verdict-text-tidak-fokus {{
+        font-family: 'Space Mono', monospace;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: {theme['accent-red']};
+        transition: color 0.3s ease;
     }}
     
-    .dataframe td {{
-        background: var(--bg-card) !important;
-        color: var(--text-primary) !important;
-        border-bottom: 1px solid var(--border) !important;
+    /* Section header */
+    .section-header {{
+        font-family: 'Space Mono', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+        transition: border-color 0.3s ease, color 0.3s ease;
     }}
     
-    /* Input fields */
-    .stTextInput input, .stSelectbox select {{
-        background: var(--bg-card) !important;
-        color: var(--text-primary) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
-    }}
-    
-    /* File uploader */
-    [data-testid="stFileUploader"] {{
+    /* Upload area */
+    .upload-container {{
         background: var(--bg-card);
         border: 1px dashed var(--border);
         border-radius: 12px;
-        padding: 16px;
+        padding: 20px;
+        margin-bottom: 12px;
+        transition: background 0.3s ease, border-color 0.3s ease;
     }}
     
-    [data-testid="stFileUploader"] label {{
-        color: var(--text-primary) !important;
+    /* Dataframe styling */
+    [data-testid="stDataFrame"] {{
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.3s ease;
+    }}
+    
+    /* Button */
+    .stButton > button {{
+        background: linear-gradient(135deg, {theme['accent-green']}, {theme['accent-blue']});
+        color: {theme['bg-primary']};
+        border: none;
+        border-radius: 8px;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        padding: 12px 32px;
+        width: 100%;
+        transition: opacity 0.2s ease, background 0.3s ease;
+    }}
+    
+    .stButton > button:hover {{
+        opacity: 0.85;
+    }}
+
+    /* Info box */
+    .info-box {{
+        background: rgba({'79,172,254' if is_dark else '0,102,204'},0.08);
+        border: 1px solid rgba({'79,172,254' if is_dark else '0,102,204'},0.25);
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }}
+    
+    /* Spinner */
+    .stSpinner > div {{
+        border-top-color: {theme['accent-green']} !important;
+    }}
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {{
+        background: var(--bg-card);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        padding: 4px;
+        gap: 4px;
+        transition: background 0.3s ease, border-color 0.3s ease;
+    }}
+    
+    .stTabs [data-baseweb="tab"] {{
+        font-family: 'Space Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        border-radius: 6px;
+        padding: 8px 20px;
+        transition: color 0.3s ease;
+    }}
+    
+    .stTabs [aria-selected="true"] {{
+        background: rgba({'0,255,136' if is_dark else '0,168,92'},0.1) !important;
+        color: {theme['accent-green']} !important;
+    }}
+    
+    /* Theme toggle styling */
+    .theme-toggle-btn {{
+        font-family: 'Space Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        border-radius: 6px;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+    }}
+    
+    .theme-toggle-btn:hover {{
+        border-color: {theme['accent-green']};
+        color: {theme['accent-green']};
+    }}
+    
+    .theme-toggle-btn.active {{
+        background: rgba({'0,255,136' if is_dark else '0,168,92'},0.15);
+        border-color: {theme['accent-green']};
+        color: {theme['accent-green']};
     }}
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(get_css(current_theme, st.session_state.theme_mode == 'dark'), unsafe_allow_html=True)
 
 # ============================================================================
-# THEME TOGGLE FUNCTION
-# ============================================================================
-
-def toggle_theme():
-    """Toggle between dark and light theme"""
-    st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
-    st.rerun()
-
-# ============================================================================
-# HEADER WITH THEME TOGGLE
-# ============================================================================
-
-# Theme toggle button in sidebar
-with st.sidebar:
-    col1, col2 = st.columns([3, 1])
-    with col2:
-        theme_icon = "🌙" if st.session_state.theme == 'light' else "☀️"
-        if st.button(theme_icon, help="Toggle theme", use_container_width=True):
-            toggle_theme()
-
-# Main header
-st.markdown("""
-<div class="main-header">
-    <h1 class="header-title">🧠 Identifikasi Tingkat Fokus berbasis Multimodal</h1>
-    <p class="header-subtitle">Deep Learning-based EEG + BPM Analysis for Student Focus Classification</p>
-</div>
-""", unsafe_allow_html=True)
-
-# ============================================================================
-# MODEL DEFINITION
+# LSTM MODEL DEFINITION
 # ============================================================================
 
 class FocusLSTM(nn.Module):
-    def __init__(self, input_size=6, hidden_size=128, num_layers=2, num_classes=2, dropout=0.3):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes, dropout=0.3):
         super(FocusLSTM, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
-        
         self.lstm = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
@@ -394,429 +408,585 @@ class FocusLSTM(nn.Module):
             batch_first=True,
             dropout=dropout if num_layers > 1 else 0
         )
-        
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(hidden_size, num_classes)
-        
+
     def forward(self, x):
-        out, _ = self.lstm(x)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        out, _ = self.lstm(x, (h0, c0))
         out = out[:, -1, :]
         out = self.dropout(out)
         out = self.fc(out)
         return out
 
 # ============================================================================
-# LOAD MODEL AND ARTIFACTS
+# LOAD ARTIFACTS (CACHED)
 # ============================================================================
 
 @st.cache_resource
-def load_model_and_artifacts():
-    """Load model, scaler, PCA, and other artifacts"""
-    try:
-        # Get paths
-        models_dir = os.path.join(os.getcwd(), 'models')
-        
-        # Load data_info
-        data_info_path = os.path.join(models_dir, 'data_info.pkl')
-        data_info = joblib.load(data_info_path)
-        
-        # Load preprocessing artifacts
-        scaler = joblib.load(os.path.join(models_dir, 'scaler.pkl'))
-        pca = joblib.load(os.path.join(models_dir, 'pca.pkl'))
-        label_encoder = joblib.load(os.path.join(models_dir, 'label_encoder.pkl'))
-        
-        # Load model
-        checkpoint = torch.load(
-            os.path.join(models_dir, 'best_model.pth'),
-            map_location=torch.device('cpu')
-        )
-        
-        # Get model config
-        model_config = checkpoint.get('model_config', {
-            'input_size': 6,
-            'hidden_size': 128,
-            'num_layers': 2,
-            'num_classes': 2,
-            'dropout': 0.3
-        })
-        
-        # Initialize model
-        model = FocusLSTM(**model_config)
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()
-        
-        return {
-            'model': model,
-            'scaler': scaler,
-            'pca': pca,
-            'label_encoder': label_encoder,
-            'data_info': data_info
-        }
-        
-    except Exception as e:
-        st.error(f"Error loading model: {str(e)}")
-        return None
-
-# ============================================================================
-# PREPROCESSING FUNCTIONS
-# ============================================================================
-
-def preprocess_data(eeg_df, bpm_df, scaler, pca, window_size=30):
-    """Preprocess EEG and BPM data for inference"""
-    try:
-        # Merge data
-        eeg_df['ts_key'] = eeg_df['Timestamp'].astype(str).str[:19]
-        bpm_df['ts_key'] = bpm_df['Timestamp'].astype(str).str[:19]
-        
-        # Remove duplicates in BPM
-        bpm_df = bpm_df.drop_duplicates(subset='ts_key', keep='first')
-        
-        # Merge
-        merged = pd.merge(eeg_df, bpm_df, on='ts_key', how='inner', suffixes=('_eeg', '_bpm'))
-        
-        if len(merged) == 0:
-            st.error("No matching timestamps between EEG and BPM data!")
-            return None
-        
-        # Select features
-        feature_cols = ['Low Alpha', 'High Alpha', 'Low Beta', 'High Beta', 'BPM', 'Avg BPM']
-        features = merged[feature_cols].values
-        
-        # Normalize
-        features_scaled = scaler.transform(features)
-        
-        # PCA
-        features_pca = pca.transform(features_scaled)
-        
-        # Create windows
-        num_samples = len(features_pca)
-        num_windows = num_samples - window_size + 1
-        
-        if num_windows <= 0:
-            st.error(f"Not enough data for windowing. Need at least {window_size} samples.")
-            return None
-        
-        windows = []
-        for i in range(num_windows):
-            window = features_pca[i:i+window_size]
-            windows.append(window)
-        
-        windows = np.array(windows)
-        
-        return windows, merged
-        
-    except Exception as e:
-        st.error(f"Preprocessing error: {str(e)}")
-        return None
-
-def predict(model, windows, label_encoder):
-    """Run prediction on windows"""
-    try:
-        with torch.no_grad():
-            X_tensor = torch.FloatTensor(windows)
-            outputs = model(X_tensor)
-            probabilities = torch.softmax(outputs, dim=1).numpy()
-            predictions = torch.argmax(outputs, dim=1).numpy()
-            labels = label_encoder.inverse_transform(predictions)
-            
-        return labels, probabilities
-        
-    except Exception as e:
-        st.error(f"Prediction error: {str(e)}")
-        return None, None
-
-# ============================================================================
-# PLOTLY THEME CONFIGURATION
-# ============================================================================
-
-def get_plotly_theme():
-    """Get plotly theme based on current theme"""
-    if st.session_state.theme == 'dark':
-        return {
-            'template': 'plotly_dark',
-            'paper_bgcolor': '#1a2035',
-            'plot_bgcolor': '#1a2035',
-            'font_color': '#e8eaf6',
-            'gridcolor': '#2d3561'
-        }
-    else:
-        return {
-            'template': 'plotly_white',
-            'paper_bgcolor': '#ffffff',
-            'plot_bgcolor': '#ffffff',
-            'font_color': '#212121',
-            'gridcolor': '#e0e0e0'
-        }
-
-# ============================================================================
-# VISUALIZATION FUNCTIONS
-# ============================================================================
-
-def create_timeline_chart(predictions, probabilities):
-    """Create per-window timeline chart"""
-    plot_theme = get_plotly_theme()
+def load_artifacts():
+    """Load model and preprocessing artifacts"""
+    models_dir = os.path.join(os.path.dirname(__file__), 'models')
     
-    colors = [theme['accent_green'] if p == 'Fokus' else theme['accent_red'] for p in predictions]
+    scaler      = joblib.load(os.path.join(models_dir, 'scaler.pkl'))
+    pca         = joblib.load(os.path.join(models_dir, 'pca.pkl'))
+    le          = joblib.load(os.path.join(models_dir, 'label_encoder.pkl'))
+    data_info   = joblib.load(os.path.join(models_dir, 'data_info.pkl'))
+    checkpoint  = torch.load(os.path.join(models_dir, 'best_model.pth'), map_location='cpu')
+    
+    model_config = checkpoint.get('model_config', {
+        'input_size': 6, 'hidden_size': 64,
+        'num_layers': 2, 'num_classes': 2, 'dropout': 0.3
+    })
+    
+    model = FocusLSTM(
+        input_size=model_config['input_size'],
+        hidden_size=model_config['hidden_size'],
+        num_layers=model_config['num_layers'],
+        num_classes=model_config['num_classes'],
+        dropout=model_config.get('dropout', 0.3)
+    )
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    
+    return model, scaler, pca, le, data_info, checkpoint
+
+# ============================================================================
+# INFERENCE FUNCTION
+# ============================================================================
+
+def run_inference(eeg_df_raw, bpm_df_raw, model, scaler, pca, le, data_info):
+    """Run full inference pipeline"""
+    
+    EEG_COLS     = ['Timestamp', 'Low Alpha', 'High Alpha', 'Low Beta', 'High Beta']
+    BPM_COLS     = ['Timestamp', 'BPM', 'Avg BPM']
+    FEATURE_COLS = ['Low Alpha', 'High Alpha', 'Low Beta', 'High Beta', 'BPM', 'Avg BPM']
+    
+    # Filter columns
+    eeg_df = eeg_df_raw[[c for c in EEG_COLS if c in eeg_df_raw.columns]].copy()
+    bpm_df = bpm_df_raw[[c for c in BPM_COLS if c in bpm_df_raw.columns]].copy()
+    
+    # Clean timestamps
+    eeg_df['ts_key'] = eeg_df['Timestamp'].astype(str).str.replace('"', '').str.replace(',', ' ').str[:19]
+    bpm_df['ts_key'] = bpm_df['Timestamp'].astype(str).str[:19]
+    
+    # Deduplicate BPM
+    bpm_clean = bpm_df.drop_duplicates(subset=['ts_key'])
+    
+    # Merge
+    merged = eeg_df.merge(bpm_clean, on='ts_key', how='inner', suffixes=('', '_bpm'))
+    
+    if merged.empty:
+        return None, "No matching timestamps between EEG and BPM!"
+    
+    # Convert numeric
+    for col in FEATURE_COLS:
+        if col in merged.columns:
+            merged[col] = pd.to_numeric(merged[col], errors='coerce').astype('float32')
+    
+    data_clean = merged[FEATURE_COLS].dropna()
+    
+    # Preprocessing
+    data_scaled = scaler.transform(data_clean.values)
+    data_pca    = pca.transform(data_scaled)
+    
+    # Windowing
+    window_size = data_info.get('window_size', 30)
+    windows = [data_pca[i:i+window_size]
+               for i in range(0, len(data_pca) - window_size + 1, window_size)]
+    
+    if not windows:
+        return None, f"Insufficient data! Need at least {window_size} samples, got {len(data_pca)}."
+    
+    X_input = torch.tensor(np.array(windows), dtype=torch.float32)
+    
+    # Predict
+    with torch.no_grad():
+        outputs       = model(X_input)
+        probabilities = torch.nn.functional.softmax(outputs, dim=1)
+        _, predicted  = torch.max(outputs, 1)
+    
+    predictions = le.inverse_transform(predicted.numpy())
+    probs       = probabilities.numpy()
+    
+    # Build results dataframe
+    results = []
+    for i, (pred, prob) in enumerate(zip(predictions, probs)):
+        pred_idx = predicted[i].item()
+        results.append({
+            'Window': i + 1,
+            'Start (s)': round(i * 0.3, 1),
+            'End (s)': round((i + 1) * 0.3, 1),
+            'Prediction': pred,
+            'Confidence (%)': round(prob[pred_idx] * 100, 2),
+            'Fokus Prob (%)': round(prob[le.transform(['Fokus'])[0]] * 100 if 'Fokus' in le.classes_ else 0, 2),
+            'Tidak Fokus Prob (%)': round(prob[le.transform(['Tidak Fokus'])[0]] * 100 if 'Tidak Fokus' in le.classes_ else 0, 2),
+        })
+    
+    return pd.DataFrame(results), None
+
+# ============================================================================
+# CHART FUNCTIONS
+# ============================================================================
+
+def chart_timeline(df, theme):
+    """Per-window prediction timeline"""
+    colors = [theme['accent-green'] if p == 'Fokus' else theme['accent-red'] for p in df['Prediction']]
     
     fig = go.Figure()
-    
     fig.add_trace(go.Bar(
-        x=list(range(len(predictions))),
-        y=[1] * len(predictions),
-        marker=dict(color=colors, line=dict(width=0)),
-        hovertemplate='<b>Window %{x}</b><br>Prediction: %{customdata[0]}<br>Confidence: %{customdata[1]:.1f}%<extra></extra>',
-        customdata=[[predictions[i], probabilities[i].max() * 100] for i in range(len(predictions))]
+        x=df['Window'],
+        y=df['Confidence (%)'],
+        marker_color=colors,
+        marker_line_width=0,
+        hovertemplate='<b>Window %{x}</b><br>%{customdata}<br>Confidence: %{y:.1f}%<extra></extra>',
+        customdata=df['Prediction'],
     ))
-    
     fig.update_layout(
-        title=dict(text='Per-Window Predictions Timeline', font=dict(size=16, color=plot_theme['font_color'])),
-        xaxis=dict(title='Window Number', gridcolor=plot_theme['gridcolor'], color=plot_theme['font_color']),
-        yaxis=dict(title='', showticklabels=False, gridcolor=plot_theme['gridcolor']),
-        template=plot_theme['template'],
-        paper_bgcolor=plot_theme['paper_bgcolor'],
-        plot_bgcolor=plot_theme['plot_bgcolor'],
-        font=dict(color=plot_theme['font_color']),
-        hovermode='x unified',
-        height=300,
+        paper_bgcolor=theme['bg-chart'],
+        plot_bgcolor=theme['plot-chart'],
+        font=dict(family='Space Mono, monospace', color=theme['text-secondary'], size=11),
+        title=dict(text='Per-Window Prediction Timeline', font=dict(size=13, color=theme['text-primary'])),
+        xaxis=dict(title='Window Number', gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        yaxis=dict(title='Confidence (%)', range=[0, 105], gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
         showlegend=False,
-        margin=dict(t=40, b=40, l=40, r=40)
+        height=300,
     )
-    
     return fig
 
-def create_distribution_chart(predictions):
-    """Create prediction distribution donut chart"""
-    plot_theme = get_plotly_theme()
+def chart_probability_line(df, theme):
+    """Probability line chart over time"""
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df['Window'], y=df['Fokus Prob (%)'],
+        name='Fokus', line=dict(color=theme['accent-green'], width=2),
+        fill='tozeroy', fillcolor=f"{theme['accent-green']}20",
+        hovertemplate='Window %{x}<br>Fokus: %{y:.1f}%<extra></extra>'
+    ))
+    fig.add_trace(go.Scatter(
+        x=df['Window'], y=df['Tidak Fokus Prob (%)'],
+        name='Tidak Fokus', line=dict(color=theme['accent-red'], width=2),
+        fill='tozeroy', fillcolor=f"{theme['accent-red']}20",
+        hovertemplate='Window %{x}<br>Tidak Fokus: %{y:.1f}%<extra></extra>'
+    ))
+    fig.add_hline(y=50, line_dash='dot', line_color=theme['text-secondary'], line_width=1)
+    fig.update_layout(
+        paper_bgcolor=theme['bg-chart'],
+        plot_bgcolor=theme['plot-chart'],
+        font=dict(family='Space Mono, monospace', color=theme['text-secondary'], size=11),
+        title=dict(text='Probability Over Time', font=dict(size=13, color=theme['text-primary'])),
+        xaxis=dict(title='Window Number', gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        yaxis=dict(title='Probability (%)', range=[0, 105], gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
+        legend=dict(
+            bgcolor='rgba(0,0,0,0)', bordercolor=theme['border'],
+            font=dict(color=theme['text-secondary'], size=10),
+            orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1
+        ),
+        height=300,
+    )
+    return fig
+
+def chart_donut(fokus_pct, tidak_fokus_pct, theme):
+    """Donut chart for overall distribution"""
+    fig = go.Figure(go.Pie(
+        labels=['Fokus', 'Tidak Fokus'],
+        values=[fokus_pct, tidak_fokus_pct],
+        hole=0.65,
+        marker=dict(colors=[theme['accent-green'], theme['accent-red']], line=dict(width=0)),
+        textinfo='percent',
+        textfont=dict(family='Space Mono', size=12, color=theme['text-primary']),
+        hovertemplate='%{label}: %{value:.1f}%<extra></extra>'
+    ))
     
-    counts = pd.Series(predictions).value_counts()
-    
-    fig = go.Figure(data=[go.Pie(
-        labels=counts.index,
-        values=counts.values,
-        hole=0.5,
-        marker=dict(colors=[theme['accent_green'], theme['accent_red']]),
-        textinfo='label+percent',
-        textfont=dict(size=14, color=plot_theme['font_color']),
-        hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
-    )])
+    max_pct = max(fokus_pct, tidak_fokus_pct)
     
     fig.update_layout(
-        title=dict(text='Prediction Distribution', font=dict(size=16, color=plot_theme['font_color'])),
-        template=plot_theme['template'],
-        paper_bgcolor=plot_theme['paper_bgcolor'],
-        font=dict(color=plot_theme['font_color']),
-        height=400,
+        paper_bgcolor=theme['bg-chart'],
+        plot_bgcolor=theme['plot-chart'],
+        font=dict(family='Space Mono, monospace', color=theme['text-secondary'], size=11),
+        title=dict(text='Distribution', font=dict(size=13, color=theme['text-primary'])),
+        margin=dict(l=40, r=20, t=40, b=40),
         showlegend=True,
-        legend=dict(font=dict(color=plot_theme['font_color'])),
-        margin=dict(t=40, b=40, l=40, r=40)
+        legend=dict(
+            bgcolor='rgba(0,0,0,0)', 
+            font=dict(color=theme['text-secondary'], size=10),
+            orientation='h', 
+            yanchor='bottom', 
+            y=-0.15, 
+            xanchor='center', 
+            x=0.5
+        ),
+        height=300,
+        annotations=[dict(
+            text=f"<b>{max_pct:.0f}%</b>",
+            x=0.5, 
+            y=0.5, 
+            showarrow=False,
+            font=dict(family='Space Mono', size=22, color=theme['text-primary'])
+        )]
     )
+    return fig
+
+def chart_confidence_hist(df, theme):
+    """Histogram of confidence distribution"""
+    fokus_conf  = df[df['Prediction'] == 'Fokus']['Confidence (%)']
+    tidak_conf  = df[df['Prediction'] == 'Tidak Fokus']['Confidence (%)']
     
+    fig = go.Figure()
+    if len(fokus_conf):
+        fig.add_trace(go.Histogram(
+            x=fokus_conf, name='Fokus',
+            marker_color=f"{theme['accent-green']}b3",
+            nbinsx=20, hovertemplate='Confidence: %{x:.0f}%<br>Count: %{y}<extra></extra>'
+        ))
+    if len(tidak_conf):
+        fig.add_trace(go.Histogram(
+            x=tidak_conf, name='Tidak Fokus',
+            marker_color=f"{theme['accent-red']}b3",
+            nbinsx=20, hovertemplate='Confidence: %{x:.0f}%<br>Count: %{y}<extra></extra>'
+        ))
+    fig.update_layout(
+        paper_bgcolor=theme['bg-chart'],
+        plot_bgcolor=theme['plot-chart'],
+        font=dict(family='Space Mono, monospace', color=theme['text-secondary'], size=11),
+        title=dict(text='Confidence Distribution', font=dict(size=13, color=theme['text-primary'])),
+        xaxis=dict(title='Confidence (%)', gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        yaxis=dict(title='Count', gridcolor=theme['grid-color'], linecolor=theme['text-secondary'], tickfont=dict(size=10)),
+        margin=dict(l=40, r=20, t=40, b=40),
+        barmode='overlay',
+        legend=dict(
+            bgcolor='rgba(0,0,0,0)', font=dict(color=theme['text-secondary'], size=10),
+            orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1
+        ),
+        height=300,
+    )
     return fig
 
 # ============================================================================
-# SIDEBAR
+# SIDEBAR - THEME TOGGLE
 # ============================================================================
 
 with st.sidebar:
-    st.markdown("### 📁 Upload Data Files")
-    
-    st.markdown('<div class="upload-section">', unsafe_allow_html=True)
-    eeg_file = st.file_uploader("📊 EEG Data (CSV)", type=['csv'], key='eeg')
+    # Theme toggle
+    st.markdown('<div style="margin-bottom: 16px;">', unsafe_allow_html=True)
+    col_dark, col_light = st.columns(2, gap="small")
+    with col_dark:
+        if st.button("🌙 Dark", key="theme_dark", use_container_width=True):
+            st.session_state.theme_mode = 'dark'
+            st.rerun()
+    with col_light:
+        if st.button("☀️ Light", key="theme_light", use_container_width=True):
+            st.session_state.theme_mode = 'light'
+            st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="upload-section">', unsafe_allow_html=True)
-    bpm_file = st.file_uploader("❤️ BPM Data (CSV)", type=['csv'], key='bpm')
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    analyze_button = st.button("🚀 RUN ANALYSIS", type="primary", use_container_width=True)
-    
-    st.markdown("---")
-    st.markdown("### ℹ️ Model Information")
-    st.markdown(f"""
-    <div style='background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border);'>
-        <p style='margin: 0; color: var(--text-secondary); font-size: 0.9rem;'>
-            <b>Architecture:</b> LSTM<br>
-            <b>Input:</b> 6 PCA features<br>
-            <b>Window Size:</b> 30 timesteps<br>
-            <b>Classes:</b> Fokus, Tidak Fokus<br>
-            <b>Theme:</b> {st.session_state.theme.capitalize()} Mode
-        </p>
+    st.markdown("""
+    <div style="text-align:center; padding: 16px 0 24px 0;">
+        <div style="font-family: Space Mono, monospace; font-size: 1.3rem; 
+                    background: linear-gradient(90deg, {}, {});
+                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                    font-weight: 700; letter-spacing: -0.5px;">
+            🧠 FocusNet
+        </div>
+        <div style="font-size: 0.72rem; color: {}; margin-top: 4px; 
+                    letter-spacing: 1px; text-transform: uppercase;">
+            LSTM · EEG + BPM
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    """.format(current_theme['accent-green'], current_theme['accent-blue'], current_theme['text-secondary']), unsafe_allow_html=True)
+    
+    # Load model status
+    try:
+        model, scaler, pca, le, data_info, checkpoint = load_artifacts()
+        st.markdown("""
+        <div style="background:rgba({},{},{},0.08); border:1px solid rgba({},{},{},0.25); 
+                    border-radius:8px; padding:12px 16px; font-size:0.8rem;">
+            <div style="color:{}; font-family:Space Mono; font-size:0.7rem; 
+                        letter-spacing:1px; margin-bottom:8px;">✓ MODEL LOADED</div>
+            <div style="color:{};">Epoch: <span style="color:{}">{}</span></div>
+            <div style="color:{};">Accuracy: <span style="color:{}">{:.2f}%</span></div>
+            <div style="color:{};">Classes: <span style="color:{}">{}</span></div>
+        </div>
+        """.format(
+            *([0,255,136] if st.session_state.theme_mode == 'dark' else [0,168,92]),
+            *([0,255,136] if st.session_state.theme_mode == 'dark' else [0,168,92]),
+            current_theme['accent-green'],
+            current_theme['text-secondary'],
+            current_theme['text-primary'],
+            checkpoint.get('epoch', 0) + 1,
+            current_theme['text-secondary'],
+            current_theme['text-primary'],
+            checkpoint.get('test_acc', 0),
+            current_theme['text-secondary'],
+            current_theme['text-primary'],
+            ', '.join(le.classes_)
+        ), unsafe_allow_html=True)
+        model_loaded = True
+    except Exception as e:
+        st.error(f"❌ Model not found!\n\nPlace model files in `/models/` folder.\n\n`{e}`")
+        model_loaded = False
+    
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="font-family:Space Mono; font-size:0.7rem; letter-spacing:1.5px; 
+                color:{}; text-transform:uppercase; margin-bottom:10px;">
+        ── UPLOAD DATA ──
+    </div>
+    """.format(current_theme['text-secondary']), unsafe_allow_html=True)
+    
+    eeg_file = st.file_uploader("📊 EEG File (.csv)", type=['csv'], key="eeg")
+    bpm_file = st.file_uploader("💓 BPM File (.csv)", type=['csv'], key="bpm")
+    
+    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+    
+    run_btn = st.button("▶ RUN ANALYSIS", disabled=(not model_loaded), use_container_width=True)
+    
+    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="font-family:Space Mono; font-size:0.65rem; color:{}; line-height:1.8;">
+        <div style="color:{}; letter-spacing:1px; margin-bottom:8px;">── INFO ──</div>
+        <div>Window: 30 timesteps</div>
+        <div>Duration/window: 0.3s</div>
+        <div>Features: 6 (post-PCA)</div>
+        <div>Model: LSTM 2-layer</div>
+    </div>
+    """.format(current_theme['text-secondary'], current_theme['text-secondary']), unsafe_allow_html=True)
 
 # ============================================================================
 # MAIN CONTENT
 # ============================================================================
 
-# Load model
-artifacts = load_model_and_artifacts()
-
-if artifacts is None:
-    st.error("Failed to load model artifacts. Please check the models directory.")
-    st.stop()
-
-# Run analysis
-if analyze_button and eeg_file and bpm_file:
-    with st.spinner("🔄 Processing data..."):
-        # Load data
-        eeg_df = pd.read_csv(eeg_file)
-        bpm_df = pd.read_csv(bpm_file)
-        
-        # Preprocess
-        window_size = artifacts['data_info'].get('window_size', 30)
-        result = preprocess_data(
-            eeg_df, bpm_df,
-            artifacts['scaler'],
-            artifacts['pca'],
-            window_size
-        )
-        
-        if result is not None:
-            windows, merged_data = result
-            
-            # Predict
-            predictions, probabilities = predict(
-                artifacts['model'],
-                windows,
-                artifacts['label_encoder']
-            )
-            
-            if predictions is not None:
-                # Calculate statistics
-                total_windows = len(predictions)
-                fokus_count = np.sum(predictions == 'Fokus')
-                tidak_fokus_count = np.sum(predictions == 'Tidak Fokus')
-                fokus_pct = (fokus_count / total_windows) * 100
-                tidak_fokus_pct = (tidak_fokus_count / total_windows) * 100
-                avg_confidence = np.mean(probabilities.max(axis=1)) * 100
-                
-                # Duration (assuming 10ms per sample)
-                duration_ms = len(merged_data) * 10
-                duration_sec = duration_ms / 1000
-                
-                # Overall verdict
-                overall_verdict = "Fokus" if fokus_pct > 50 else "Tidak Fokus"
-                verdict_class = "verdict-fokus" if overall_verdict == "Fokus" else "verdict-tidak-fokus"
-                verdict_emoji = "🟢" if overall_verdict == "Fokus" else "🔴"
-                
-                # Display verdict banner
-                st.markdown(f"""
-                <div class="verdict-banner {verdict_class}">
-                    {verdict_emoji} <b>OVERALL VERDICT: {overall_verdict.upper()}</b>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Metrics
-                col1, col2, col3, col4, col5 = st.columns(5)
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-label">Total Windows</div>
-                        <div class="metric-value">{total_windows:,}</div>
-                        <div class="metric-unit">windows</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-label">Duration</div>
-                        <div class="metric-value">{duration_sec:.1f}</div>
-                        <div class="metric-unit">seconds</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col3:
-                    st.markdown(f"""
-                    <div class="metric-card" style="border-left: 4px solid {theme['accent_green']};">
-                        <div class="metric-label">🟢 Fokus</div>
-                        <div class="metric-value" style="color: {theme['accent_green']};">{fokus_pct:.1f}</div>
-                        <div class="metric-unit">% of windows</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col4:
-                    st.markdown(f"""
-                    <div class="metric-card" style="border-left: 4px solid {theme['accent_red']};">
-                        <div class="metric-label">🔴 Tidak Fokus</div>
-                        <div class="metric-value" style="color: {theme['accent_red']};">{tidak_fokus_pct:.1f}</div>
-                        <div class="metric-unit">% of windows</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col5:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-label">Avg Confidence</div>
-                        <div class="metric-value">{avg_confidence:.1f}</div>
-                        <div class="metric-unit">%</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Charts
-                st.markdown("### 📈 Visualizations")
-                
-                col1, col2 = st.columns([2, 1])
-                
-                with col1:
-                    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-                    fig_timeline = create_timeline_chart(predictions, probabilities)
-                    st.plotly_chart(fig_timeline, use_container_width=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-                    fig_dist = create_distribution_chart(predictions)
-                    st.plotly_chart(fig_dist, use_container_width=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                # Results table
-                st.markdown("### 📋 Detailed Results")
-                
-                results_df = pd.DataFrame({
-                    'Window': range(len(predictions)),
-                    'Prediction': predictions,
-                    'Confidence': [f"{p.max()*100:.2f}%" for p in probabilities],
-                    'Fokus Prob': [f"{p[artifacts['label_encoder'].transform(['Fokus'])[0]]*100:.2f}%" for p in probabilities],
-                    'Tidak Fokus Prob': [f"{p[artifacts['label_encoder'].transform(['Tidak Fokus'])[0]]*100:.2f}%" for p in probabilities]
-                })
-                
-                # Color coding function
-                def highlight_predictions(row):
-                    if row['Prediction'] == 'Fokus':
-                        return [f'background-color: {theme["accent_green"]}20; color: {theme["text_primary"]}'] * len(row)
-                    else:
-                        return [f'background-color: {theme["accent_red"]}20; color: {theme["text_primary"]}'] * len(row)
-                
-                styled_df = results_df.style.apply(highlight_predictions, axis=1)
-                st.dataframe(styled_df, use_container_width=True, height=400)
-                
-                # Download button
-                csv = results_df.to_csv(index=False)
-                st.download_button(
-                    label="📥 Download Results (CSV)",
-                    data=csv,
-                    file_name="focus_detection_results.csv",
-                    mime="text/csv"
-                )
-
-elif analyze_button:
-    st.warning("⚠️ Please upload both EEG and BPM data files first!")
-
-else:
-    st.info("👈 Upload EEG and BPM files in the sidebar and click 'RUN ANALYSIS' to begin.")
-
-# ============================================================================
-# FOOTER
-# ============================================================================
-
-st.markdown("---")
-st.markdown(f"""
-<div style='text-align: center; color: var(--text-secondary); padding: 20px;'>
-    <p style='margin: 0; font-size: 0.9rem;'>
-        🧠 Focus Detection System | Deep Learning-based Analysis<br>
-        Current Theme: <b>{st.session_state.theme.capitalize()}</b>
-    </p>
+# Header
+st.markdown("""
+<div class="main-header">
+    <p class="header-title">🧠 Identifikasi Tingkat Fokus berbasis Multimodal</p>
+    <p class="header-subtitle">EEG + BPM Multimodal Analysis · LSTM Deep Learning</p>
+    <p class="header-subtitle">Muhammad Azril Haidar Al Matiin - 23051640011</p>
+    <span class="header-badge">Multimodal · TESIS · v1.5</span>
 </div>
 """, unsafe_allow_html=True)
+
+# ============================================================================
+# DEFAULT STATE — Instructions
+# ============================================================================
+
+if not run_btn or eeg_file is None or bpm_file is None:
+    
+    if not model_loaded:
+        st.warning("⚠️ Model files not found. Please check the `/models/` directory.")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div class="metric-card metric-accent-blue">
+            <div class="metric-label">Step 1</div>
+            <div class="metric-value" style="font-size:1.5rem">📊 Upload</div>
+            <div class="metric-sub">Upload EEG CSV dan BPM CSV di sidebar kiri</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="metric-card metric-accent-green">
+            <div class="metric-label">Step 2</div>
+            <div class="metric-value" style="font-size:1.5rem">▶ Run</div>
+            <div class="metric-sub">Klik tombol RUN ANALYSIS untuk memulai prediksi</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="metric-card metric-accent-yellow">
+            <div class="metric-label">Step 3</div>
+            <div class="metric-value" style="font-size:1.5rem">📈 Hasil</div>
+            <div class="metric-sub">Lihat dashboard prediksi, grafik, dan statistik</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="info-box" style="margin-top:24px">
+        <b style="color:{accent_blue}">📌 Format File yang Dibutuhkan:</b><br><br>
+        <b>EEG CSV:</b> Timestamp, Low Alpha, High Alpha, Low Beta, High Beta<br>
+        <b>BPM CSV:</b> Timestamp, BPM, Avg BPM
+    </div>
+    """.format(accent_blue=current_theme['accent-blue']), unsafe_allow_html=True)
+    
+    st.stop()
+
+# ============================================================================
+# RUN INFERENCE
+# ============================================================================
+
+with st.spinner("🔄 Processing data and running inference..."):
+    try:
+        eeg_df_raw = pd.read_csv(eeg_file)
+        bpm_df_raw = pd.read_csv(bpm_file)
+        
+        results_df, error = run_inference(eeg_df_raw, bpm_df_raw, model, scaler, pca, le, data_info)
+        
+        if error:
+            st.error(f"❌ {error}")
+            st.stop()
+            
+    except Exception as e:
+        st.error(f"❌ Error: {e}")
+        st.stop()
+
+# ============================================================================
+# COMPUTE STATS
+# ============================================================================
+
+total_windows  = len(results_df)
+total_duration = total_windows * 0.3
+
+fokus_count    = (results_df['Prediction'] == 'Fokus').sum()
+tidak_count    = (results_df['Prediction'] == 'Tidak Fokus').sum()
+fokus_pct      = (fokus_count / total_windows) * 100
+tidak_pct      = (tidak_count / total_windows) * 100
+
+avg_conf       = results_df['Confidence (%)'].mean()
+majority       = 'Fokus' if fokus_count >= tidak_count else 'Tidak Fokus'
+
+# ============================================================================
+# VERDICT BANNER
+# ============================================================================
+
+if majority == 'Fokus':
+    st.markdown(f"""
+    <div class="verdict-fokus">
+        <div class="verdict-label">Overall Verdict</div>
+        <div class="verdict-text-fokus">🟢 FOKUS</div>
+        <div style="color:{current_theme['text-secondary']}; font-size:0.85rem; margin-top:8px;">
+            Dominant in {fokus_pct:.1f}% of sessions · Avg confidence {avg_conf:.1f}%
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="verdict-tidak-fokus">
+        <div class="verdict-label">Overall Verdict</div>
+        <div class="verdict-text-tidak-fokus">🔴 TIDAK FOKUS</div>
+        <div style="color:{current_theme['text-secondary']}; font-size:0.85rem; margin-top:8px;">
+            Dominant in {tidak_pct:.1f}% of sessions · Avg confidence {avg_conf:.1f}%
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+
+# ============================================================================
+# METRIC CARDS
+# ============================================================================
+
+c1, c2, c3, c4, c5 = st.columns(5)
+
+with c1:
+    st.markdown(f"""
+    <div class="metric-card metric-accent-blue">
+        <div class="metric-label">Total Windows</div>
+        <div class="metric-value">{total_windows}</div>
+        <div class="metric-sub">windows analyzed</div>
+    </div>""", unsafe_allow_html=True)
+
+with c2:
+    st.markdown(f"""
+    <div class="metric-card metric-accent-yellow">
+        <div class="metric-label">Total Duration</div>
+        <div class="metric-value">{total_duration:.1f}s</div>
+        <div class="metric-sub">{total_duration/60:.2f} minutes</div>
+    </div>""", unsafe_allow_html=True)
+
+with c3:
+    st.markdown(f"""
+    <div class="metric-card metric-accent-green">
+        <div class="metric-label">Fokus</div>
+        <div class="metric-value" style="color:{current_theme['accent-green']}">{fokus_pct:.1f}%</div>
+        <div class="metric-sub">{fokus_count} windows · {fokus_count*0.3:.1f}s</div>
+    </div>""", unsafe_allow_html=True)
+
+with c4:
+    st.markdown(f"""
+    <div class="metric-card metric-accent-red">
+        <div class="metric-label">Tidak Fokus</div>
+        <div class="metric-value" style="color:{current_theme['accent-red']}">{tidak_pct:.1f}%</div>
+        <div class="metric-sub">{tidak_count} windows · {tidak_count*0.3:.1f}s</div>
+    </div>""", unsafe_allow_html=True)
+
+with c5:
+    st.markdown(f"""
+    <div class="metric-card metric-accent-blue">
+        <div class="metric-label">Avg Confidence</div>
+        <div class="metric-value">{avg_conf:.1f}%</div>
+        <div class="metric-sub">model certainty</div>
+    </div>""", unsafe_allow_html=True)
+
+st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+
+# ============================================================================
+# CHARTS - ROW 1
+# ============================================================================
+
+st.markdown('<div class="section-header">── VISUALIZATION</div>', unsafe_allow_html=True)
+
+col_left, col_right = st.columns([2, 1])
+
+with col_left:
+    st.plotly_chart(chart_timeline(results_df, current_theme), use_container_width=True)
+
+with col_right:
+    st.plotly_chart(chart_donut(fokus_pct, tidak_pct, current_theme), use_container_width=True)
+
+# ============================================================================
+# TABS: TABLE + DOWNLOAD
+# ============================================================================
+
+st.markdown('<div class="section-header">── DETAIL DATA</div>', unsafe_allow_html=True)
+
+tab1, tab2 = st.tabs(["📋 PER-WINDOW RESULTS", "⬇️ EXPORT"])
+
+with tab1:
+    def color_prediction(val):
+        if val == 'Fokus':
+            return f'color: {current_theme["accent-green"]}; font-weight: bold'
+        else:
+            return f'color: {current_theme["accent-red"]}; font-weight: bold'
+    
+    # FIX: Use .map() instead of deprecated .applymap() for Pandas 2.x
+    styled_df = results_df.style.map(
+        color_prediction, subset=['Prediction']
+    ).format({
+        'Confidence (%)': '{:.2f}',
+        'Fokus Prob (%)': '{:.2f}',
+        'Tidak Fokus Prob (%)': '{:.2f}',
+        'Start (s)': '{:.1f}',
+        'End (s)': '{:.1f}',
+    }).set_properties(**{
+        'background-color': current_theme['bg-card'],
+        'color': current_theme['text-primary'],
+        'border-color': current_theme['border'],
+        'font-family': 'Space Mono, monospace',
+        'font-size': '12px'
+    })
+    
+    st.dataframe(styled_df, use_container_width=True, height=350)
+
+with tab2:
+    st.markdown("""
+    <div class="info-box">
+        Download hasil prediksi sebagai CSV untuk dokumentasi tesis.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    csv = results_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="⬇️ DOWNLOAD RESULTS (.csv)",
+        data=csv,
+        file_name=f"focus_prediction_results.csv",
+        mime="text/csv"
+    )
