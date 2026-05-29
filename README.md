@@ -59,7 +59,7 @@ git push -u origin main
 
 ### 3. Deploy di Streamlit Cloud
 
-1. Buka [share.streamlit.io](https://share.streamlit.io)
+1. Buka [share.streamlit.io]([https://share.streamlit.io](https://tesis-multimodal-azril.streamlit.app/))
 2. Login dengan GitHub
 3. Klik **New app**
 4. Pilih repository, branch `main`, file `app.py`
